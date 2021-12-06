@@ -1,0 +1,14 @@
+FROM node:14-alpine As development
+
+WORKDIR /usr/src
+COPY package*.json ./
+RUN  npm install minimist && \
+    npm install --only=development
+
+COPY . .
+RUN npm run build:app
+
+#! this is the production image
+FROM nginx:latest as production
+COPY ./docker/angular.conf /etc/nginx/nginx.conf
+COPY --from=development /usr/src/dist/apps/fwa /usr/share/nginx/html
