@@ -1,38 +1,35 @@
-# ! Command to run
-# docker-compose -f .\development.yml -p "test-dev" up
-
 version: '3.7'
 
 services:
   frontend:
     container_name: test-frontend
-    hostname: poirot_frontend
-    image: poirot_frontend
+    hostname: test-frontend
+    image: test-frontend
     build:
       context: .
-      dockerfile: ./apps/fwa/Dockerfile.angular
+      dockerfile: ./apps/docker-serve/Dockerfile.angular
       target: development
     ports:
       - 4200:4200
     networks:
-      - poirot-network
+      - test-network
     depends_on:
       - api
     volumes:
-      - .:/usr/src
-      - /usr/src/node_modules
-    command: npm run start:app
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npx nx serve --host 0.0.0.0 --poll 2000
   api:
     container_name: test-api
-    hostname: poirot_api
-    image: poirot_api
+    hostname: test_api
+    image: test_api
     build:
       context: .
-      dockerfile: ./apps/fwa-api/Dockerfile.api
+      dockerfile: ./apps/api/Dockerfile.api
       target: development
     volumes:
-      - .:/usr/src
-      - /usr/src/node_modules
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     ports:
       - 3333:3333
       - 9229:9229
@@ -40,11 +37,9 @@ services:
     env_file:
       - .env
     networks:
-      - poirot-network
+      - test-network
 
 networks:
-  poirot-network:
+  test-network:
     driver: bridge
 
-volumes:
-  pgdata_poirot:

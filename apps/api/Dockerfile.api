@@ -1,6 +1,6 @@
 FROM node:14-alpine As development
 
-WORKDIR /usr/src
+WORKDIR /usr/src/app
 
 COPY package*.json ./
 
@@ -17,7 +17,7 @@ FROM node:14-alpine as production
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-WORKDIR /app
+WORKDIR /usr/src
 
 COPY package*.json ./
 
@@ -25,7 +25,6 @@ RUN  npm install minimist typescript ts-node lodash reflect-metadata tslib rxjs 
   npm install --only=production
 
 COPY . .
-COPY --from=development /usr/src/dist/apps/fwa-api ./dist
+COPY --from=development /usr/src/app/dist/apps/fwa-api ./dist
 EXPOSE 3333
-#! Migration runenr command: node_modules/ts-node/dist/bin.js migration-runner.ts
 CMD ["node", "dist/main"]
